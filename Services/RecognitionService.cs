@@ -3,6 +3,10 @@ using Recognition.Extensions;
 using Microsoft.Extensions.Options;
 using Recognition.Options;
 using System.Net.Mime;
+using UglyToad.PdfPig;
+using System.Text;
+using System.Linq;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace Recognition.Services
 {
@@ -34,8 +38,14 @@ namespace Recognition.Services
         }
 
         internal async Task<string> OcrFromPdf(IFormFile file)
-        { 
-            throw new NotImplementedException();
+        {
+            var fullPath = await file.SaveDiskAsync();
+            using var pdfDocumenta = PdfDocument.Open(fullPath);
+            var stringBuilder = new StringBuilder();
+            foreach (var page in pdfDocumenta.GetPages())
+                stringBuilder.AppendLine(page.Text);
+
+            return stringBuilder.ToString();
         }
     }
 }
